@@ -8,6 +8,7 @@ on:
       - "backend/**"
       - "frontend/**"
       - "docker/**"
+      - ".github/workflows/**"
     tags:
       - "v*.*.*"
   workflow_dispatch:
@@ -64,6 +65,13 @@ jobs:
           context: .
           file: ./docker/backend.Dockerfile
           push: true
+          platforms: linux/amd64
+          # Default provenance on a public repo is mode=max. That publishes an OCI
+          # index whose attestation child is a separate, untagged GHCR version.
+          # Deleting untagged versions then leaves `latest` pointing at a broken
+          # index ("manifest unknown"). A single-platform image does not need that.
+          provenance: false
+          sbom: false
           tags: ${{ steps.meta_backend.outputs.tags }}
           labels: ${{ steps.meta_backend.outputs.labels }}
           cache-from: type=gha
@@ -75,6 +83,9 @@ jobs:
           context: .
           file: ./docker/frontend.Dockerfile
           push: true
+          platforms: linux/amd64
+          provenance: false
+          sbom: false
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
           cache-from: type=gha

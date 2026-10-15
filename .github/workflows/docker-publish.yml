@@ -30,7 +30,10 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT }}
+          # GITHUB_TOKEN is issued per run and inherits packages: write above.
+          # A long-lived GH_PAT expires or loses package scope and then docker
+          # login fails with: Get "https://ghcr.io/v2/": denied: denied
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Backend image
         id: meta_backend
